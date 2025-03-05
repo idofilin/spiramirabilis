@@ -84,7 +84,7 @@ function initRendering (progs) {
 		bytesize: sizeof.uint32,
 	});
 
-	const shellVData = shellVertices(256, 128, 5.0*twopi);
+	const shellVData = shellVertices(192, 96, 5.0*twopi);
 	renderer.addVertexData("shellcoords", {
 		data: shellVData.coords,
 		attributes : [{coord:2}],
