@@ -25,7 +25,8 @@ out vec3 normalVec;
 out vec2 thetaphi;
 
 uniform float beta;
-uniform mat4 MVPmatrix;
+uniform mat4 projmatrix;
+uniform mat4 rotmatrix;
 
 void main()
 {
@@ -37,8 +38,8 @@ void main()
 	vec3 gencurvepoint = 1.0*R*sin(beta) * vec3( cos(phi)*vec2(cos(theta), sin(theta)) , sin(phi));
 
     positVec = spiral + gencurvepoint;
-	gl_Position =  MVPmatrix * vec4(positVec, 1.0);
-	normalVec = (MVPmatrix * vec4( vec3( cos(phi)*vec2(cos(theta), sin(theta)) , sin(phi)), 1.0) ).xyz ;     
+	gl_Position =  projmatrix * rotmatrix * vec4(positVec, 1.0);
+	normalVec = (rotmatrix * vec4( vec3( cos(phi)*vec2(cos(theta), sin(theta)) , sin(phi)), 1.0) ).xyz ;     
 	thetaphi = coord;
 }
 

@@ -35,7 +35,6 @@ window.addEventListener("DOMContentLoaded", setupApp, false);
 
 async function setupApp(evt) {
 	window.removeEventListener(evt.type, setupApp, false);
-	renderer.setDefaultResizer(resizeCanvasCallback);
 	const button = document.getElementById('fullscreen-button');
 	button.onclick = ()=>{canvas.requestFullscreen(canvas)};
 	const fileSelect = document.getElementById("dataset-select");
@@ -43,6 +42,7 @@ async function setupApp(evt) {
 	document.body.appendChild(progressShow.htmlElement);
 	let shaderPrograms = await loadShaderPrograms(progressShow);
 	initRendering(shaderPrograms);
+	renderer.setDefaultResizer(resizeCanvasCallback);
 }
 
 async function loadShaderPrograms(progress) {
@@ -55,14 +55,12 @@ async function loadShaderPrograms(progress) {
 	return { shell: shellprog } ;
 }
 
-let transMat = null;
+let projectionMatrix = calcProjection(context.aspect);
 const fbosize = 128;
 let offscreenFBO = null, offscreenTex = Array(4);
 let shaders;
 let cleanupIsSet = false;
 function initRendering (progs) {
-
-	//transMat = calcTransMat( [ cloudMids[0], cloudMids[1], deltaZ ], initialScaler, zScaler);
 
 	shaders = progs;
 	
@@ -102,6 +100,7 @@ function initRendering (progs) {
 	gl.useProgram(shaders.shell[GLNAME]);
 	//gl.uniform3f(shaders.shell.fixedColor, 1.0, 1.0, 1.0 );
 	gl.uniform1f(shaders.shell.beta, Math.PI/6.0);
+	gl.uniformMatrix4fv(shaders.shell.projmatrix, false, projectionMatrix);
 
 	gl.viewport(0,0,gl.drawingBufferWidth,gl.drawingBufferHeight);
 	gl.frontFace(gl.CCW);
@@ -128,17 +127,14 @@ function initRendering (progs) {
 	}
 }
 
-
 function shellScene(timestamp) {
 	const offsets = renderer.vertexData;
-	//const mvpMat = transMat;
 	let prog = shaders.shell;
 	
 	const rotMat = Transform.translationYawPitchRoll( 
 		[0.0, 0.0, 0.0], 
 		[1e-4*Math.E*timestamp, 1e-4*Math.SQRT2*timestamp, 1e-4*Math.PI/2.0*timestamp] );
-	const mvpMat = rotMat;
-	gl.uniformMatrix4fv(prog.MVPmatrix, false, mvpMat);
+	gl.uniformMatrix4fv(prog.rotmatrix, false, rotMat);
 
 	gl.useProgram(prog[GLNAME]);
 	bindAttributePointer(prog.coord, offsets.shellcoords, offsets.shellcoords.coord);
@@ -146,10 +142,6 @@ function shellScene(timestamp) {
 	gl.drawElements(gl.TRIANGLE_STRIP, offsets.shellindices.data.length, gl.UNSIGNED_INT, offsets.shellindices.byteoffset);
 
 	renderer.animate(shellScene);
-}
-
-function resizeCanvasCallback (e, projection) {
-	//console.log("Resize event placeholder handler.");
 }
 
 function bindAttributePointer(attribHandle, buffer, bufferHandle) {
@@ -184,6 +176,20 @@ function shellVertices(numTheta=72, numAperture=24, maxTheta=twopi*3) {
 	); 
 
 	return { coords: Float32Array.from(shellCoords), indices: Uint32Array.from(shellIndices) };
+}
+
+function resizeCanvasCallback (e) {
+	//console.log(e);
+	gl.viewport(0,0,gl.drawingBufferWidth,gl.drawingBufferHeight);
+	projectionMatrix = calcProjection(context.aspect);
+	gl.uniformMatrix4fv(shaders.shell.projmatrix, false, projectionMatrix);
+}
+
+function calcProjection (ratio=1.0) {
+	let P = Transform.identity();
+	P[0] = (ratio < 1.0) ? ratio : 1.0;
+	P[5] = (ratio < 1.0) ? 1.0 : 1.0/ratio;
+	return P;
 }
 
 
