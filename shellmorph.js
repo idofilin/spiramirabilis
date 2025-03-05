@@ -104,7 +104,7 @@ function initRendering (progs) {
 
 	gl.viewport(0,0,gl.drawingBufferWidth,gl.drawingBufferHeight);
 	gl.frontFace(gl.CCW);
-	gl.enable(gl.CULL_FACE);
+	gl.disable(gl.CULL_FACE);
 	gl.depthFunc(gl.LEQUAL);
 	gl.enable(gl.DEPTH_TEST);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
