@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2024 Ido Filin. 
+Copyright (C) 2025 Ido Filin. 
 
 This GLSL code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public
