@@ -31,10 +31,10 @@ const float ambiencefactor = 0.5;
 
 void main(void)
 {
-	float directLightFactor = dot(lightVector, normalize(normalVec));
-	vec3 mixedcolor = ambiencefactor*ambientcolor + (1.0-ambiencefactor)*lightcolor*abs(directLightFactor);
-	//vec3 mixedcolor = mix(downcolor, upcolor, zfactor);
-	fragment_color = mix(0.6, 1.0, gl_FrontFacing) * vec4(
+	float directLightFactor = abs(dot(lightVector, normalize(normalVec)));
+	vec3 mixedcolor = ambiencefactor*ambientcolor + 
+			(1.0-ambiencefactor)*lightcolor*mix(1.0 - directLightFactor, directLightFactor, gl_FrontFacing);
+	fragment_color = mix(0.8, 1.0, gl_FrontFacing) * vec4(
 			mixedcolor, 
 			smoothstep( 0.5 , 1.0, 1.0 - cos(thetaphi.y))
 	);
