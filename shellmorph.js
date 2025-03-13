@@ -64,26 +64,6 @@ function initRendering (progs) {
 
 	shaders = progs;
 	
-	const bill_Vertices = new Float32Array([
-					 -1.0, -1.0, 0.0, 0.0,
-					  1.0, -1.0, 1.0, 0.0,
-					  1.0, 1.0, 1.0, 1.0,
-					 -1.0, 1.0, 0.0, 1.0,
-			]);
-	const bill_Indices = new Uint32Array([
-				0, 1, 2, 0, 2, 3,
-			]);
-	renderer.addVertexData("billboard", {
-		data: Float32Array.from(bill_Vertices),
-		attributes : [{coord:4}],
-		bytesize : sizeof.float32,
-	});
-	renderer.addVertexData("billboardindices", {
-		buffertype:"index",
-		data: Uint32Array.from(bill_Indices),
-		bytesize: sizeof.uint32,
-	});
-
 	const shellVData = shellVertices(192, 96, 5.0*twopi);
 	renderer.addVertexData("shellcoords", {
 		data: shellVData.coords,
@@ -160,9 +140,9 @@ function shellVertices(numTheta=72, numAperture=24, maxTheta=twopi*3) {
 		const denom = 2*numAp,
 			j = Math.trunc(i/denom),
 			k = Math.floor(i/2)%numAp,
-			theta = j*maxTheta/(numTheta - 1),
-			phi = k*twopi/numAperture + ((k==0) && eps|| 0.0);
-			return (i%2 == 0) && theta || phi ;
+			theta = j*maxTheta/(numTheta - 1) - maxTheta,
+			phi = -Math.PI + k*twopi/numAperture + ((k==0) && eps|| 0.0);
+			return (i%2 == 0)? theta : phi ;
 		}
 	); 
 
@@ -171,7 +151,7 @@ function shellVertices(numTheta=72, numAperture=24, maxTheta=twopi*3) {
 		const denom = 2*numAp,
 			j = 1 + Math.trunc(i/denom),
 			k = Math.floor(i/2)%numAp;
-			return (i%2 == 0) && j*numAp+k || (j-1)*numAp+k ;
+			return (i%2 == 0)? j*numAp+k : (j-1)*numAp+k ;
 		}
 	); 
 

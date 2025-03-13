@@ -33,7 +33,7 @@ void main()
 	float theta = coord.x;
 	float phi = coord.y;
 	
-	float R = 0.04*exp(0.085*theta);
+	float R = 0.95*exp(0.085*theta);
 	vec3 spiral = R * vec3( sin(beta)*vec2(cos(theta), sin(theta)) , -cos(beta)) + vec3(0.0, 0.0, 0.5);
 	vec3 gencurvepoint = 1.0*R*sin(beta) * vec3( cos(phi)*vec2(cos(theta), sin(theta)) , sin(phi));
 
