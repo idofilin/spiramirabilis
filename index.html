@@ -22,16 +22,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <meta charset="utf-8"/>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=20, user-scalable=yes, minimal-ui"/>
+
+  <link rel="stylesheet" type="text/css" media="screen" href="spiramirabilis.css"/>
 </head>
 <body role="document" style="background:black; color:white;">
-  <button id="fullscreen-button">Full screen</button>
-  <canvas id="app-canvas" style="height:400px; width:400px;"> </canvas>
-  <!--
-  <label for="dataset-menu">Dataset selector:</label>
-  <select name="dataset-menu" id="dataset-select">
-	<option value="">VOID</option>
-  </select>
-  -->
+  <canvas id="app-canvas"> </canvas>
+
+<div id="app-menu">
+  <label for="pitch-slider" id="pitch-label">Pitch angle</label>
+  <input type="range" min="0" max="360" value="0" id="pitch-slider"/>
+  <label for="roll-slider" id="roll-label">Roll angle</label>
+  <input type="range" min="0" max="360" value="135" id="roll-slider"/>
+  <div>
+	  <input type="checkbox" id="multispiral-check" name="multispiral-check">
+	  <label for="multispiral-check">Multispirals</label><br>
+	  <input type="checkbox" id="gencurve-check" name="gencurve-check">
+	  <label for="gencurve-check">Generating curve</label><br>
+	  <input type="checkbox" id="archishell-check" name="archishell-check">
+	  <label for="archishell-check">Archimedean shell</label><br>
+  </div>
+  <div>
+	  <button id="fullscreen-button">Full screen</button>
+	  <button id="image-render">Read to image</button>
+  </div>
+  <label for="opacity-slider" id="opacity-label">Shell opacity</label>
+  <input type="range" min="0.5" max="1" value="0.95" step="0.01" id="opacity-slider"/>
+</div><!--app menu-->
+  <label for="final-image-container">Clickable downloadable image:</label>
+  <div id="final-image-container"></div>
   <script type="module" src="./shellmorph.js"> </script>
 </body>
 </html>

@@ -24,18 +24,19 @@ in vec2 thetaphi;
 
 out vec4 fragment_color;
 
+uniform float fixedcolorFactor;
+uniform vec3 fixedColor;
+uniform float alphaOut;
+
 const vec3 lightVector = normalize(vec3(+1.0, +1.0, +1.0));
 const vec3 lightcolor = vec3(0.8, 0.8, 0.1);
-const vec3 ambientcolor = vec3(1.0, 1.0, 1.0);
-const float ambiencefactor = 0.5;
 
 void main(void)
 {
 	float directLightFactor = abs(dot(lightVector, normalize(normalVec)));
-	vec3 mixedcolor = ambiencefactor*ambientcolor + 
-			(1.0-ambiencefactor)*lightcolor*mix(1.0 - directLightFactor, directLightFactor, gl_FrontFacing);
-	fragment_color = mix(0.8, 1.0, gl_FrontFacing) * vec4(
-			mixedcolor, 
-			smoothstep( 0.5 , 1.0, 1.0 - cos(thetaphi.y))
-	);
+	vec3 directLightColor = lightcolor*mix((1.0 - directLightFactor), directLightFactor, gl_FrontFacing);
+	vec3 shellColor = mix(0.8, 1.0, gl_FrontFacing) * mix( directLightColor, fixedColor, fixedcolorFactor );
+			
+	//float alphaOut = smoothstep( 0.5 , 1.0, 1.0 - cos(thetaphi.y));
+	fragment_color = vec4(shellColor, alphaOut);
 }
