@@ -42,7 +42,7 @@ let createImageFlag = false;
 let multispiralFlag = false;
 let gencurveFlag = false;
 let archimedeanFlag = false;
-let shellOpacity = 0.96;
+let shellOpacity = 1.0;
 async function setupApp(evt) {
 	window.removeEventListener(evt.type, setupApp, false);
 
