@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2025 Ido Filin. 
+Copyright (C) 2025–2026 Ido Filin. 
 
 This GLSL code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public
@@ -27,9 +27,19 @@ out vec4 fragment_color;
 uniform float fixedcolorFactor;
 uniform vec3 fixedColor;
 uniform float alphaOut;
+uniform int multispiral;
 
 const vec3 lightVector = normalize(vec3(+1.0, +1.0, +1.0));
 const vec3 lightcolor = vec3(0.8, 0.8, 0.1);
+const vec3 multispiralColors[7] = vec3[](
+    vec3(0.2, 0.4, 0.85), 
+    vec3(0.86, 0.22, 0.07), 
+    vec3(1.0, 0.6, 0.0),
+    vec3(0.06, 0.59, 9.09), 
+    vec3(0.6, 0.0, 0.6), 
+    vec3(1.0, 0.6, 0.77), 
+    vec3(0.86, 0.27, 0.46) 
+);
 
 void main(void)
 {
@@ -37,6 +47,17 @@ void main(void)
 	vec3 directLightColor = lightcolor*mix((1.0 - directLightFactor), directLightFactor, gl_FrontFacing);
 	vec3 shellColor = mix(0.8, 1.0, gl_FrontFacing) * mix( directLightColor, fixedColor, fixedcolorFactor );
 			
-	//float alphaOut = smoothstep( 0.5 , 1.0, 1.0 - cos(thetaphi.y));
-	fragment_color = vec4(shellColor, alphaOut);
+	vec4 outgoingColor = vec4(shellColor, alphaOut);
+	if (bool(multispiral)) {
+		float phi = (thetaphi.y+PI)/2.0/PI*7.0 + 1.0;
+		int multispiralIndex = int(mod(floor(phi+6.0),7.0));
+		vec4 multispiralColor = 
+				vec4(multispiralColors[multispiralIndex],1.0);
+		outgoingColor = mix(multispiralColor,outgoingColor,
+				step(0.2,mod(phi*phi/4.8,1.0)));
+		if (outgoingColor.a < 1.e-6) 
+			discard;
+	}
+
+	fragment_color = outgoingColor;
 }

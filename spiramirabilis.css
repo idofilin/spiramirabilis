@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2025 Ido Filin. 
+Copyright (C) 2025–2026 Ido Filin. 
 
 This CSS code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public
@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 body>canvas {
 	display:inline-block;
+	vertical-align: top;
 	height:min(100vw,100vh,768px);
 	width:min(100vw,100vh,768px);
 	margin-right:24px;
@@ -23,7 +24,13 @@ body>canvas {
 
 #app-menu {
 	display:inline-block;
-	min-width:360px;
+	min-width:400px;
+	max-width:768px;
+}
+
+#w-label,#sigma-label,#lead0-label,#derived-label {
+	font-size:36px;	
+	min-width:400px;
 	max-width:768px;
 }
 

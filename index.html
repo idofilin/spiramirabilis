@@ -1,5 +1,5 @@
 <!--
-Copyright (C) 2025 Ido Filin. 
+Copyright (C) 2025–2026 Ido Filin. 
 
 This HTML code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public
@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <!doctype html>
 <html lang="en">
 <head>
-  <title>Spira Mirabilis: Theoretical Morphology of Snail Shells</title>
+  <title>Spira Mirabilis: Theoretical Morphology of Snailshells</title>
   <meta charset="utf-8"/>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=20, user-scalable=yes, minimal-ui"/>
@@ -29,24 +29,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <canvas id="app-canvas"> </canvas>
 
 <div id="app-menu">
+  <label id="derived-label">&#x1D6FD; &#x1D6FC;</label>
+  <label for="lead0-slider" id="lead0-label">&#x1D706;&#x2080;</label>
+  <input type="range" min="0" max="1.5708" value="0.22" step="0.01" id="lead0-slider"/>
+  <label for="w-slider" id="w-label">&#x1D464;&#x0303; &#x1D6FE;</label>
+  <input type="range" min="5" max="40" value="11.43" step="0.01" id="w-slider"/>
+  <label for="sigma-slider" id="sigma-label">&#x1D70E;</label>
+  <input type="range" min="0" max="0.25" value="0.0" step="0.001" id="sigma-slider"/>
   <label for="pitch-slider" id="pitch-label">Pitch angle</label>
-  <input type="range" min="0" max="360" value="0" id="pitch-slider"/>
+  <input type="range" min="0" max="360" value="69" id="pitch-slider"/>
   <label for="roll-slider" id="roll-label">Roll angle</label>
-  <input type="range" min="0" max="360" value="135" id="roll-slider"/>
+  <input type="range" min="0" max="360" value="120" id="roll-slider"/>
   <div>
+	  <label for="opacity-slider" id="opacity-label">Shell opacity</label>
+	  <input type="range" min="0.0" max="1.0" value="1.0" step="0.01" id="opacity-slider"/>
+	  <input type="checkbox" id="shelldraw-check" name="shelldraw-check" checked>
+	  <label for="shelldraw-check">Shell</label><br>
 	  <input type="checkbox" id="multispiral-check" name="multispiral-check">
 	  <label for="multispiral-check">Multispirals</label><br>
+	  <input type="checkbox" id="centerline-check" name="centerline-check">
+	  <label for="centerline-check">Centerline spiral</label><br>
 	  <input type="checkbox" id="gencurve-check" name="gencurve-check">
 	  <label for="gencurve-check">Generating curve</label><br>
+	  <input type="checkbox" id="planispiral-check" name="planispiral-check">
+	  <label for="planispiral-check">Planispirals</label><br>
+	  <input type="checkbox" id="helix-check" name="helix-check">
+	  <label for="helix-check">Circular helix</label><br>
 	  <input type="checkbox" id="archishell-check" name="archishell-check">
-	  <label for="archishell-check">Archimedean shell</label><br>
+	  <label for="archishell-check" disabled>Archimedean shell</label><br>
   </div>
   <div>
 	  <button id="fullscreen-button">Full screen</button>
 	  <button id="image-render">Read to image</button>
   </div>
-  <label for="opacity-slider" id="opacity-label">Shell opacity</label>
-  <input type="range" min="0.5" max="1.0" value="1.0" step="0.01" id="opacity-slider"/>
 </div><!--app menu-->
   <label for="final-image-container">Clickable downloadable image:</label>
   <div id="final-image-container"></div>
