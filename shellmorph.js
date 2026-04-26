@@ -102,7 +102,7 @@ async function setupApp(evt) {
 	slider.oninput = function(){
 		wTilde = Number(this.value); 
 		recalcDerivedCoilingParams();
-		wslideLabel.innerHTML=`&#x1D464;&#x0303;: ${wTilde}, &#x1D6FE;=${spiralExpansion.toPrecision(3)}`; 
+		wslideLabel.innerHTML=`w&#x0303;: ${wTilde}, &#x1D6FE;=${spiralExpansion.toPrecision(3)}`; 
 		scene();};
 	slider.oninput()
 
@@ -330,6 +330,7 @@ function shellScene(timestamp) {
 			gl.UNSIGNED_INT,
 			offsets.shellindices.byteoffset); 
 	}
+	gl.uniform1i(prog.multispiral, false);
 
 	/* Draw generating curve(s) */
 	if (gencurveFlag) {

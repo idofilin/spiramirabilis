@@ -34,6 +34,11 @@ body>canvas {
 	max-width:768px;
 }
 
+#w-label::first-letter {
+	font-family:serif;
+	font-style:italic;
+}
+
 input[type="checkbox"],
 button {
 	display:inline;
