@@ -25,6 +25,7 @@ out vec3 normalVec;
 out vec2 thetaphi;
 
 uniform vec2 lambda;
+uniform float thetaFactor;
 uniform float expansionRate;
 uniform float beta;
 uniform float S0;
@@ -35,6 +36,16 @@ uniform mat4 projmatrix;
 uniform mat4 rotmatrix;
 //uniform int archimedes;
 uniform int circhelix;
+
+float solutionXcoord(float theta, float c, float gamma, float lambda) {
+/* This is taken from symbolic math solution, using GNU Octave and SymPy */
+    return -pow(c, 4.0)*cos(lambda)*cos(theta) + pow(c, 3.0)*gamma*sin(lambda)*cos(theta) - 2.0*pow(c, 3.0)*sin(lambda)*sin(theta) - pow(c, 2.0)*pow(gamma, 2.0)*cos(lambda)*cos(theta) - 3.0*pow(c, 2.0)*gamma*sin(theta)*cos(lambda) + c*pow(gamma, 3.0)*sin(lambda)*cos(theta) + 3.0*c*gamma*sin(lambda)*cos(theta) + 2.0*c*sin(lambda)*sin(theta) - pow(gamma, 3.0)*sin(theta)*cos(lambda) + pow(gamma, 2.0)*cos(lambda)*cos(theta) - gamma*sin(theta)*cos(lambda) + cos(lambda)*cos(theta);
+}
+
+float solutionYcoord(float theta, float c, float gamma, float lambda) {
+/* This is taken from symbolic math solution, using GNU Octave and SymPy */
+    return -pow(c, 4.0)*sin(theta)*cos(lambda) + pow(c, 3.0)*gamma*sin(lambda)*sin(theta) + 2.0*pow(c, 3.0)*sin(lambda)*cos(theta) - pow(c, 2.0)*pow(gamma, 2.0)*sin(theta)*cos(lambda) + 3.0*pow(c, 2.0)*gamma*cos(lambda)*cos(theta) + c*pow(gamma, 3.0)*sin(lambda)*sin(theta) + 3.0*c*gamma*sin(lambda)*sin(theta) - 2.0*c*sin(lambda)*cos(theta) + pow(gamma, 3.0)*cos(lambda)*cos(theta) + pow(gamma, 2.0)*sin(theta)*cos(lambda) + gamma*cos(lambda)*cos(theta) + sin(theta)*cos(lambda);
+}
 
 vec3 rotateXYZonAxis(vec3 xyz, vec3 axis, float ang) {
     float cang = cos(ang);
@@ -48,15 +59,23 @@ void main()
 	float g = expansionRate;
 	float lead0 = lambda.x;
 	float c = lambda.y;
-	float theta = coord.x + revolutionOffset;
+	float theta = (coord.x + revolutionOffset)*thetaFactor;
 	float phi = coord.y;
 	
 	float s = S0*exp(g*theta);
 	float lead = lead0 + c*theta;
 	vec2 revVec = vec2(cos(theta), sin(theta));
-	vec3 spiral = s * vec3(g*cos(lead)*revVec, 
-					g*(c*cos(lead) - g*sin(lead))/(c*c+g*g))
-					+ vec3(0.0, 0.0, zOffset);
+	float xydenom = pow(c,4.0) + 
+			2.0*pow(c,2.0)*pow(g,2.0) - 
+			2.0*pow(c,2.0) + 
+			pow(g,4.0) + 
+			2.0*pow(g,2.0) + 1.0;
+	float xcoordFactor = solutionXcoord(theta, c, g, lead);
+	float ycoordFactor = solutionYcoord(theta, c, g, lead);
+	vec3 spiral = g*s * 
+			vec3(xcoordFactor/xydenom, ycoordFactor/xydenom,
+				sqrt(1.0-c*c)*(c*cos(lead) - g*sin(lead))/(pow(c,2.0)+pow(g,2.0)))
+			+ vec3(0.0, 0.0, zOffset);
 
 /*
 	if (bool(archimedes)) {
@@ -78,9 +97,8 @@ void main()
 						vec3(0.0, 0.0, scale);
 	}
 
-
 	vec3 apertureMargin = rotateXYZonAxis(
-			vec3(revVec*0.1, 0.0) + vec3( cos(phi)*revVec, sin(phi) ),
+			vec3(revVec*0.0, 0.0) + vec3( cos(phi)*revVec, sin(phi) ),
 			vec3(revVec,0.0), -lead);
 	vec3 gencurvepoint = dilation*s*apertureMargin;
     positVec = spiral + gencurvepoint;

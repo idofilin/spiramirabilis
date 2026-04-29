@@ -41,8 +41,8 @@ window.addEventListener("DOMContentLoaded", setupApp, false);
 let createImageFlag = false;
 let multispiralFlag = false;
 let shellDrawFlag = true;
-let centerlineFlag = false;
-let gencurveFlag = false;
+let centerlineFlag = true;
+let gencurveFlag = true;
 let planispiralFlag = false;
 let helixFlag = false;
 //let archimedeanFlag = false;
@@ -51,11 +51,14 @@ function cot(x) {return 1.0/Math.tan(x)};
 function acot(x) {return Math.atan(1.0/x)};
 let pitchAngle,rollAngle,
 	leadAngle0 = Number(document.getElementById('lead0-slider').value), 
+	leadAngleFin,
 	wTilde = Number(document.getElementById('w-slider').value),
 	sigma = Number(document.getElementById('sigma-slider').value),
 	spiralExpansion,
 	leadAngleRate,
 	centerBeta, centerAlpha;
+const sigmaLabel = document.querySelector('#sigma-label');
+const dispLabel = document.querySelector('#derived-label');
 
 async function setupApp(evt) {
 	window.removeEventListener(evt.type, setupApp, false);
@@ -107,16 +110,16 @@ async function setupApp(evt) {
 	slider.oninput()
 
 	slider = document.getElementById('sigma-slider');
-	const sigmaLabel = document.querySelector('#sigma-label');
 	slider.oninput = function(){
 		sigma = Number(this.value); 
 		recalcDerivedCoilingParams();
-		sigmaLabel.innerHTML=`&#x1D70E;: ${sigma}, d&#x1D706;/d&#x1D703;=${leadAngleRate.toPrecision(3)}`; 
+		//sigmaLabel.innerHTML=`&#x1D70E;: ${sigma}, d&#x1D706;/d&#x1D703;=${leadAngleRate.toPrecision(3)}`; 
 		scene();};
 	slider.oninput()
 
 
-	let checkboxElmnt = document.querySelector("#multispiral-check"); checkboxElmnt.checked=false;
+	let checkboxElmnt = document.querySelector("#multispiral-check"); 
+	multispiralFlag=checkboxElmnt.checked;
 	checkboxElmnt.onclick = function(){
 		multispiralFlag=this.checked;
 		scene();
@@ -124,7 +127,7 @@ async function setupApp(evt) {
 	const multiSpiralCheck = checkboxElmnt;
 
 	checkboxElmnt = document.querySelector("#shelldraw-check");
-	checkboxElmnt.checked=true;
+	shellDrawFlag=checkboxElmnt.checked;
 	checkboxElmnt.onclick = function(){
 		shellDrawFlag=this.checked;
 		scene();
@@ -132,7 +135,7 @@ async function setupApp(evt) {
 	const shellDrawCheck = checkboxElmnt;
 
 	checkboxElmnt = document.querySelector("#centerline-check");
-	checkboxElmnt.checked=false;
+	centerlineFlag=checkboxElmnt.checked;
 	checkboxElmnt.onclick = function(){
 		centerlineFlag=this.checked;
 		scene();
@@ -140,7 +143,7 @@ async function setupApp(evt) {
 	const centerlineCheck = checkboxElmnt;
 
 	checkboxElmnt = document.querySelector("#gencurve-check");
-	checkboxElmnt.checked=false;
+	gencurveFlag=checkboxElmnt.checked;
 	checkboxElmnt.onclick = function(){
 		gencurveFlag=this.checked;
 		scene();
@@ -148,7 +151,7 @@ async function setupApp(evt) {
 	const genCurveCheck = checkboxElmnt;
 
 	checkboxElmnt = document.querySelector("#planispiral-check");
-	checkboxElmnt.checked=false;
+	planispiralFlag=checkboxElmnt.checked;
 	checkboxElmnt.onclick = function(){
 		planispiralFlag=this.checked;
 		scene();
@@ -156,7 +159,7 @@ async function setupApp(evt) {
 	const planispiralCheck = checkboxElmnt;
 
 	checkboxElmnt = document.querySelector("#helix-check");
-	checkboxElmnt.checked=false;
+	helixFlag=checkboxElmnt.checked;
 	checkboxElmnt.onclick = function(){
 		helixFlag=this.checked;
 		scene();
@@ -199,7 +202,7 @@ const thetaN = 512;
 const phiN = 256;
 function initRendering (progs) {
 	shaders = progs;
-	const shellVData = shellVertices(thetaN, phiN, maxTheta);
+	const shellVData = shellVertices(thetaN, phiN, maxTheta0);
 	renderer.addVertexData("shellcoords", {
 		data: shellVData.coords,
 		attributes : [{coord:2}],
@@ -235,8 +238,10 @@ function initRendering (progs) {
 	}
 }
 
-const maxTheta =  5.25*twopi;
 const centerS0 = 0.05;
+const centerSfin = 1.157035;
+const maxTheta0 =  5.25*twopi;
+const centerW0 = maxTheta0/Math.log(centerSfin/centerS0);
 const dilation = 0.075;
 const centerlineDilation = 0.005625;//0.015*(dilation/0.2);
 let zRescale=1.0, zOffset=0.0;
@@ -431,6 +436,7 @@ function imageFromFBO (fbo) {
 function clamp(x,xmin,xmax) {return Math.min(Math.max(xmin,x),xmax)};
 function recalcDerivedCoilingParams() {	
 	let zMin,zMax,rMax,zRange
+	let maxTheta =  maxTheta0*wTilde/centerW0;
 	spiralExpansion = 1.0/wTilde;
 	leadAngleRate = sigma/Math.sqrt(1+sigma**2);
 	centerBeta = Math.atan(spiralExpansion / 
@@ -445,7 +451,7 @@ function recalcDerivedCoilingParams() {
 	let s = centerS0*Math.exp(g*maxTheta);
 	let apsize0 = centerS0*dilation, 
 		apsize = s*dilation;
-	let leadAngleFin = leadAngle0 + leadAngleRate*maxTheta;
+	leadAngleFin = leadAngle0 + leadAngleRate*maxTheta;
 	let apsizeExtra = clamp(Math.abs(leadAngleFin/halfpi),1.0,1.0)*apsize;
 	let zCurrent =  s*g * (
 		Math.sin(leadAngleFin)*g/denom - 
@@ -472,8 +478,8 @@ function recalcDerivedCoilingParams() {
 		zOffset = +Cz;
 	}
 	resizeCanvasCallback();
-	const dispLabel = document.querySelector('#derived-label');
-	dispLabel.innerHTML=`&#x1D6FD;=${(centerBeta*rad2deg).toPrecision(3)}&deg;, &#x1D6FC;=${(centerAlpha*rad2deg).toPrecision(3)}&deg;`; 
+	dispLabel.innerHTML=`&#x1D6FD;&#x2080;=${(centerBeta*rad2deg).toPrecision(3)}&deg;, &#x1D6FC;&#x2080;=${(centerAlpha*rad2deg).toPrecision(3)}&deg;`; 
+	sigmaLabel.innerHTML=`&#x1D70E;: ${sigma}, &#x1D706;<sub>final</sub>=${(leadAngleFin*rad2deg).toPrecision(3)}&deg;`; 
 }
 
 function scene() {
@@ -481,6 +487,8 @@ function scene() {
 	//gl.uniform1i(prog.archimedes, archimedeanFlag);
 	gl.uniform1i(prog.circhelix, false);
 	gl.uniform1i(prog.multispiral, false);
+	gl.uniform1f(prog.thetaFactor, wTilde/centerW0);
+	console.log(wTilde/centerW0);
 	renderer.animate(shellScene);
 }
 
