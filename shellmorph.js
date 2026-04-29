@@ -488,7 +488,7 @@ function scene() {
 	gl.uniform1i(prog.circhelix, false);
 	gl.uniform1i(prog.multispiral, false);
 	gl.uniform1f(prog.thetaFactor, wTilde/centerW0);
-	console.log(wTilde/centerW0);
+	//console.log(wTilde/centerW0);
 	renderer.animate(shellScene);
 }
 
