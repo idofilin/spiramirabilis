@@ -20,9 +20,9 @@ precision highp float;
 
 in vec2 coord;
 
-out vec3 positVec;
-out vec3 normalVec;
-out vec2 thetaphi;
+smooth centroid out vec3 positVec;
+smooth centroid out vec3 normalVec;
+smooth centroid out vec2 thetaphi;
 
 uniform vec2 lambda;
 uniform float thetaFactor;

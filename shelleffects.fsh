@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 precision highp float;
 #define PI 3.141592653589793238462643383279502884
 
-in vec3 positVec;
-in vec3 normalVec;
-in vec2 thetaphi;
+smooth centroid in vec3 positVec;
+smooth centroid in vec3 normalVec;
+smooth centroid in vec2 thetaphi;
 
 out vec4 fragment_color;
 
@@ -43,21 +43,25 @@ const vec3 multispiralColors[7] = vec3[](
 
 void main(void)
 {
-	float directLightFactor = abs(dot(lightVector, normalize(normalVec)));
-	vec3 directLightColor = lightcolor*mix((1.0 - directLightFactor), directLightFactor, gl_FrontFacing);
-	vec3 shellColor = mix(0.8, 1.0, gl_FrontFacing) * mix( directLightColor, fixedColor, fixedcolorFactor );
-			
-	vec4 outgoingColor = vec4(shellColor, alphaOut);
-	if (bool(multispiral)) {
-		float phi = (thetaphi.y+PI)/2.0/PI*7.0 + 1.0;
+	vec4 outgoingColor;
+	float phi = (thetaphi.y+1.1*PI)/2.0/PI*7.0 + 1.0;
+	bool isNotMultispiral = bool(step(0.2,mod(phi*phi/4.8,1.0)) > 0.0);
+	bool multispiralFlag = bool(multispiral);
+	if (multispiralFlag && isNotMultispiral) {
+		discard;
+	} else if (multispiralFlag) {
 		int multispiralIndex = int(mod(floor(phi+6.0),7.0));
 		vec4 multispiralColor = 
 				vec4(multispiralColors[multispiralIndex],1.0);
-		outgoingColor = mix(multispiralColor,outgoingColor,
-				step(0.2,mod(phi*phi/4.8,1.0)));
-		if (outgoingColor.a < 1.e-6) 
-			discard;
+		outgoingColor = multispiralColor;
+	} else {
+		float directLightFactor = abs(dot(lightVector, normalize(normalVec)));
+		vec3 directLightColor = lightcolor*mix(1.0 - directLightFactor, directLightFactor, gl_FrontFacing);
+		vec3 shellColor = mix(0.8, 1.0, gl_FrontFacing) * 
+			mix( directLightColor, fixedColor, fixedcolorFactor );
+		outgoingColor = vec4(shellColor, alphaOut);
 	}
 
 	fragment_color = outgoingColor;
+	//gl_FragDepth = gl_FragDepth - float(gl_FrontFacing)*1.0e-3;
 }

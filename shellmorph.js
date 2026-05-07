@@ -216,8 +216,13 @@ function initRendering (progs) {
 	renderer.updateBuffers();
 	
 	gl.frontFace(gl.CCW);
+	gl.enable(gl.CULL_FACE);
 	gl.depthFunc(gl.LEQUAL);
 	gl.enable(gl.DEPTH_TEST);
+	/*
+	gl.enable(gl.SAMPLE_COVERAGE);
+	gl.sampleCoverage(0.75, false);
+	*/
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	gl.enable(gl.BLEND);
 	gl.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -279,7 +284,6 @@ function shellScene(timestamp) {
 	gl.uniform1f(prog.revolutionOffset, +0.0*Math.PI);
 	/* Draw centerline */
 	if (centerlineFlag) {
-		gl.enable(gl.CULL_FACE);
 		gl.uniform1f(prog.S0, centerS0);
 		gl.uniform1f(prog.beta, centerBeta);
 		gl.uniform3f(prog.fixedColor, 1.0, 0.0, 0.0 );
@@ -290,7 +294,6 @@ function shellScene(timestamp) {
 
 	/* Draw planispirals */
 	if (planispiralFlag) {
-		gl.enable(gl.CULL_FACE);
 		gl.uniform1f(prog.alphaOut, 0.85);
 		gl.uniform1f(prog.S0, centerS0);
 		gl.uniform1f(prog.beta, Math.PI/2.0);
@@ -307,7 +310,6 @@ function shellScene(timestamp) {
 
 	/* Draw a regular circular helix */
 	if (helixFlag) {
-		gl.enable(gl.CULL_FACE);
 		gl.uniform1i(prog.circhelix, true);
 		gl.uniform1f(prog.alphaOut, 0.85);
 		gl.uniform1f(prog.beta, centerBeta);
@@ -318,7 +320,6 @@ function shellScene(timestamp) {
 	}
 
 	/* Draw shell */
-	gl.disable(gl.CULL_FACE);
 	gl.uniform1f(prog.S0, centerS0);
 	gl.uniform1f(prog.revolutionOffset, - 0.5*Math.PI);
 	gl.uniform1f(prog.beta, centerBeta);
@@ -328,12 +329,28 @@ function shellScene(timestamp) {
 	gl.uniform1f(prog.alphaOut, shellOpacity);
 	if (multispiralFlag) {
 		gl.uniform1i(prog.multispiral, true);
-	}
-	if (shellDrawFlag) {
+		gl.disable(gl.CULL_FACE);
 		gl.drawElements(gl.TRIANGLE_STRIP,
 			offsets.shellindices.data.length,
 			gl.UNSIGNED_INT,
 			offsets.shellindices.byteoffset); 
+		gl.uniform1i(prog.multispiral, false);
+		gl.enable(gl.CULL_FACE);
+	}
+	if (shellDrawFlag) {
+		gl.enable(gl.CULL_FACE);
+		gl.depthFunc(gl.LESS);
+		gl.drawElements(gl.TRIANGLE_STRIP,
+			offsets.shellindices.data.length,
+			gl.UNSIGNED_INT,
+			offsets.shellindices.byteoffset); 
+		gl.disable(gl.CULL_FACE);
+		gl.drawElements(gl.TRIANGLE_STRIP,
+			offsets.shellindices.data.length,
+			gl.UNSIGNED_INT,
+			offsets.shellindices.byteoffset); 
+		gl.depthFunc(gl.LEQUAL);
+		gl.enable(gl.CULL_FACE);
 	}
 	gl.uniform1i(prog.multispiral, false);
 
